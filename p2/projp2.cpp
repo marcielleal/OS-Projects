@@ -7,6 +7,7 @@
 #include <array>
 #include "json.hpp"
 #include <queue>
+#include <fstream>
 
 using json = nlohmann::json;
 
@@ -41,21 +42,41 @@ json getJson(std::string pid,int tab){
     return saida;
 }
 
-std::string printJson(json output){
-	
+std::string callForProc(){
+	return exec("ps hax -o user | sort | uniq -c");
+}
 
-	return "";
+int getNumProc(std::string retCmd){
+	std::istringstream f(retCmd);
+	std::string line;
+	int temp,total=0;
+	while (std::getline(f,line)){
+		sscanf(line.c_str(),"%d",&temp);
+		total+=temp;
+	}
+
+	return total;
 }
 
 
 int main(int argc,char **argv){
 	json saida;    
-	
+	std::ofstream saidaJson;
+
 	if(argc<2){
 		std::cout<<"ARGUMENTOS INVALIDOS"<<std::endl;
 		return -1;
 	}
-	std::cout<<getJson(argv[1],0)<<std::endl;
+	saidaJson.open((std::string(argv[1])+std::string(".json")),std::ifstream::out);
+	if(saidaJson.is_open()){
+		saidaJson<<getJson(argv[1],0);
+		saidaJson.close();
+	}else std::cout<<"ERRO AO ABRIR ARQUIVO"<<std::endl;
 
+	std::string retCmd=callForProc();
+
+	std::cout<<"Total number of processes: "<<getNumProc(retCmd)<<std::endl;
+	std::cout<<"Processes per user: \n"<<retCmd<<std::endl;
+	
 	return 0;
 }
