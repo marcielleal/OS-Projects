@@ -28,7 +28,9 @@ json getJson(std::string pid,int tab){
     std::string line;
 
     for(int i=0;i<tab;++i)
-    	std::cout<<"  |";
+    	if(i+1==tab)
+		std::cout<<".  |-";
+	else std::cout<<".  ";
     std::cout<<pid<<"_\n";
 
     while (std::getline(f,line)){
