@@ -23,6 +23,17 @@ std::string exec(const char* cmd) {
     }
     return result;
 }
+std::string getName(std::string pid){
+    std::istringstream f (exec((std::string("cat /proc/")+pid+std::string("/status")).c_str()));
+    std::string line;
+    std::getline(f,line);
+    if(line.size()>5)
+        if(line.substr(0,3)!="cat")
+            return line.substr(5,line.size());
+    if(pid[0]=='0')
+        return "init";
+    return "";
+}
 
 json getJson(std::string pid,int tab){
     json saida;
@@ -33,15 +44,16 @@ json getJson(std::string pid,int tab){
     	if(i+1==tab)
 		std::cout<<".  |-";
 	else std::cout<<".  ";
-    std::cout<<pid<<"_\n";
+    std::cout<<pid<<"_"<<getName(pid)<<"\n";
 
     while (std::getline(f,line)){
-	saida[pid][line]=getJson(line,tab+1)[line];
+    	saida[pid][line]=getJson(line,tab+1)[line];
     }
     if(saida==nullptr)
 	saida[pid]=nullptr;
     return saida;
 }
+
 
 std::string callForProc(){
 	return exec("ps hax -o user | sort | uniq -c");
@@ -85,7 +97,9 @@ int main(int argc,char **argv){
 
 		std::cout<<"Total number of processes: "<<getNumProc(retCmd)<<std::endl;
 		std::cout<<"Processes per user: \n"<<retCmd<<std::endl;
-		sleep(time);
+        std::cout<<std::endl<<std::endl;
+        sleep(time);
+        
 	}
 	return 0;
 }

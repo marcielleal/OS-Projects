@@ -66,7 +66,7 @@ int main(int argc,char **argv){
 	int time;
 
 	if(argc<3){
-		std::cout<<"ARGUMENTOS INVALIDOS"<<std::endl;
+		std::cout<<"NO ARGS"<<std::endl;
 		return -1;
 	}
 	sscanf(argv[2],"%d",&time);

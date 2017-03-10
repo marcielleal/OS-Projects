@@ -18,9 +18,19 @@ std::string exec(const char* cmd) {
     if (!pipe) throw std::runtime_error("popen() failed!");
     while (!feof(pipe.get())) {
         if (fgets(buffer.data(), 128, pipe.get()) != NULL)
-            result += buffer.data();
+            result +=buffer.data();
     }
     return result;
+}
+
+std::string getName(std::string pid){
+    std::istringstream f (exec((std::string("cat /proc/")+pid+std::string("/status")).c_str()));
+    std::string line;
+    std::getline(f,line);
+    if(line.size()>5)
+        if(line.substr(0,3)!="cat")
+            return line.substr(5,line.size());
+    return "";
 }
 
 json getJson(std::string pid,int tab){
@@ -32,7 +42,7 @@ json getJson(std::string pid,int tab){
     	if(i+1==tab)
 		std::cout<<".  |-";
 	else std::cout<<".  ";
-    std::cout<<pid<<"_\n";
+    std::cout<<pid<<"_"<<getName(pid)<<"\n";
 
     while (std::getline(f,line)){
 	saida[pid][line]=getJson(line,tab+1)[line];
@@ -67,11 +77,11 @@ int main(int argc,char **argv){
 		std::cout<<"ARGUMENTOS INVALIDOS"<<std::endl;
 		return -1;
 	}
-	saidaJson.open((std::string(argv[1])+std::string(".json")),std::ifstream::out);
+	saidaJson.open((std::string(argv[1])+std::string(".json")),std::ifstream::app);
 	if(saidaJson.is_open()){
 		saidaJson<<getJson(argv[1],0);
 		saidaJson.close();
-	}else std::cout<<"ERRO AO ABRIR ARQUIVO"<<std::endl;
+	}else std::cout<<"IT DOES NOT OPEN x.json"<<std::endl;
 
 	std::string retCmd=callForProc();
 
