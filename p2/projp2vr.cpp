@@ -24,12 +24,12 @@ std::string exec(const char* cmd) {
     return result;
 }
 
-json getJson(std::string pid,int tab){
+json getJson(std::string pid){
     json saida;
     std::istringstream f (exec((std::string("pgrep -P ")+pid).c_str()));
     std::string line;
     while (std::getline(f,line)){
-	saida[pid][line]=getJson(line,tab+1)[line];
+	saida[pid][line]=getJson(line)[line];
     }
     if(saida==nullptr)
 	saida[pid]=nullptr;
@@ -72,10 +72,20 @@ int main(int argc,char **argv){
 	while(1){
 		std::string retCmd = callForProc();
 
+		saidaJson.open((std::string(argv[1])+std::string(".json")),std::ifstream::out);
+		if(saidaJson.is_open()){
+			saidaJson<<getJson(argv[1]);
+			saidaJson.close();
+		}else
+		{
+			std::cout<<"Exception opening/reading file"<<std::endl;
+			exit(EXIT_FAILURE);
+		}
+
 		std::cout << "Total number of processes: " << getNumProc(retCmd) << std::endl;
 		std::cout << "Processes per user: \n"<<retCmd<<std::endl;
-        std::cout << std::endl << std::endl;
-        sleep(time);
+        	std::cout << std::endl << std::endl;
+	        sleep(time);
 	}
 	return 0;
 }
