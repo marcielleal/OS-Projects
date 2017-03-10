@@ -24,14 +24,19 @@ std::string exec(const char* cmd) {
     return result;
 }
 std::string getName(std::string pid){
-    std::istringstream f (exec((std::string("cat /proc/")+pid+std::string("/status")).c_str()));
-    std::string line;
-    std::getline(f,line);
-    if(line.size()>5)
-        if(line.substr(0,3)!="cat")
-            return line.substr(5,line.size());
-    if(pid[0]=='0')
+    char buff[100];
+    std::string fileName(std::string("/proc/")+pid+std::string("/status"));
+    std::ifstream file;
+    file.open(fileName.c_str(),std::ifstream::in);
+
+	if(file.is_open()){
+		file.getline(buff,100);
+		return std::string(buff).substr(5);
+	}
+
+	if(pid[0]=='0')
         return "init";
+    
     return "";
 }
 
