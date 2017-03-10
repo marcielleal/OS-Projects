@@ -28,13 +28,6 @@ json getJson(std::string pid,int tab){
     json saida;
     std::istringstream f (exec((std::string("pgrep -P ")+pid).c_str()));
     std::string line;
-//----------------------------
-//    for(int i=0;i<tab;++i)
-//    	if(i+1==tab)
-//		std::cout<<".  |-";
-//	else std::cout<<".  ";
-//    std::cout<<pid<<"_\n";
-//----------------------------
     while (std::getline(f,line)){
 	saida[pid][line]=getJson(line,tab+1)[line];
     }
@@ -66,21 +59,23 @@ int main(int argc,char **argv){
 	int time;
 
 	if(argc<3){
-		std::cout<<"NO ARGS"<<std::endl;
-		return -1;
+		std::cout<<"Usage: " << argv[0] << " <PID of Process> <Time of Refresh>\n" << std::endl;
+		exit(EXIT_FAILURE);
 	}
+	
 	sscanf(argv[2],"%d",&time);
-	if(time<=0){
-		std::cout<<"SETTING TIME FOR 1s"<<std::endl;
-		time=1;
+	if( time<=0 ){
+		std::cout<<"Time doesn't run backwards"<<std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	while(1){
-		std::string retCmd=callForProc();
+		std::string retCmd = callForProc();
 
-		std::cout<<"Total number of processes: "<<getNumProc(retCmd)<<std::endl;
-		std::cout<<"Processes per user: \n"<<retCmd<<std::endl;
-		sleep(time);
+		std::cout << "Total number of processes: " << getNumProc(retCmd) << std::endl;
+		std::cout << "Processes per user: \n"<<retCmd<<std::endl;
+        std::cout << std::endl << std::endl;
+        sleep(time);
 	}
 	return 0;
 }

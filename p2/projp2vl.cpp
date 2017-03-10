@@ -12,7 +12,8 @@
 
 using json = nlohmann::json;
 
-std::string exec(const char* cmd) {
+//Shell executes the cmd command and uses pipes to redirect to this process
+std::string shell_exec(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;
     std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
@@ -23,6 +24,8 @@ std::string exec(const char* cmd) {
     }
     return result;
 }
+
+//Get name of Process from PID
 std::string getName(std::string pid){
     char buff[100];
     std::string fileName(std::string("/proc/")+pid+std::string("/status"));
@@ -42,14 +45,14 @@ std::string getName(std::string pid){
 
 json getJson(std::string pid,int tab){
     json saida;
-    std::istringstream f (exec((std::string("pgrep -P ")+pid).c_str()));
+    std::istringstream f (shell_exec((std::string("pgrep -P ")+pid).c_str()));
     std::string line;
 
     for(int i=0;i<tab;++i)
     	if(i+1==tab)
-		std::cout<<".  |-";
+		std::cout<<".  │-(";
 	else std::cout<<".  ";
-    std::cout<<pid<<"_"<<getName(pid)<<"\n";
+    std::cout<<pid<<")"<<getName(pid)<<"\n";
 
     while (std::getline(f,line)){
     	saida[pid][line]=getJson(line,tab+1)[line];
@@ -61,7 +64,7 @@ json getJson(std::string pid,int tab){
 
 
 std::string callForProc(){
-	return exec("ps hax -o user | sort | uniq -c");
+	return shell_exec("ps hax -o user | sort | uniq -c");
 }
 
 int getNumProc(std::string retCmd){
@@ -80,29 +83,33 @@ int getNumProc(std::string retCmd){
 int main(int argc,char **argv){
 	json saida;    
 	std::ofstream saidaJson;
-	int time;
+	float time;
 
 	if(argc<3){
-		std::cout<<"ARGUMENTOS INVALIDOS"<<std::endl;
-		return -1;
+		std::cout<<"Usage: " << argv[0] << " <PID of Process> <Time of Refresh>\n" << std::endl;
+		exit(EXIT_FAILURE);
 	}
-	sscanf(argv[2],"%d",&time);
-	if(time<=0){
-		std::cout<<"SETTING TIME FOR 1s"<<std::endl;
-		time=1;
+	sscanf(argv[2],"%f",&time);
+	if( time<=0 ){
+		std::cout<<"Time doesn't run backwards"<<std::endl;
+		exit(EXIT_FAILURE);
 	}
 	while(true){
 		saidaJson.open((std::string(argv[1])+std::string(".json")),std::ifstream::out);
 		if(saidaJson.is_open()){
 			saidaJson<<getJson(argv[1],0);
 			saidaJson.close();
-		}else std::cout<<"ERRO AO ABRIR ARQUIVO"<<std::endl;
+		}else
+		{
+			std::cout<<"Exception opening/reading file"<<std::endl;
+			exit(EXIT_FAILURE);
+		}
 
-		std::string retCmd=callForProc();
+		std::string retCmd = callForProc();
 
-		std::cout<<"Total number of processes: "<<getNumProc(retCmd)<<std::endl;
-		std::cout<<"Processes per user: \n"<<retCmd<<std::endl;
-        std::cout<<std::endl<<std::endl;
+		std::cout << "Total number of processes: " << getNumProc(retCmd) << std::endl;
+		std::cout << "Processes per user: \n"<<retCmd<<std::endl;
+        std::cout << std::endl << std::endl;
         sleep(time);
         
 	}
