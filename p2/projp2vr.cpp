@@ -74,7 +74,7 @@ int main(int argc,char **argv){
 
 		saidaJson.open((std::string(argv[1])+std::string(".json")),std::ifstream::out);
 		if(saidaJson.is_open()){
-			saidaJson<<getJson(argv[1]);
+			saidaJson<<getJson(argv[1]).dump(4);
 			saidaJson.close();
 		}else
 		{
