@@ -36,7 +36,7 @@ std::string getName(std::string pid){
 		file.getline(buff,100);
 		return std::string(buff).substr(5);
 	}
-
+	file.close();
 	if(pid[0]=='0')
         return "init";
     
