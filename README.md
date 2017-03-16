@@ -23,13 +23,13 @@ Para arquitetura x86-64:
 ###Execução
 
 O executável **limit** corresponde à primeira parte do projeto, para executá-lo são necessários dois parâmetros:
-* ./p1/limit \<new soft limit>  \<new hard limit>
+* ./p1/limit *\<new soft limit>*  *\<new hard limit>*
 
 O executável **vl** corresponde à segunda parte do projeto, para executá-lo são necessários dois parâmetros - o PID e o tempo entre cada impressão, como podemos ver abaixo:
-* ./p2/vl \<PID of Process> \<Time of Refresh>
+* ./p2/vl *\<PID of Process>* *\<Time of Refresh>*
 
 O executável **vr** é uma "versão rápida" de **vl**, ele não imprime a árvore na saída padrão, para executá-lo são necessários dois parâmetros - o PID e o tempo entre cada impressão, como podemos ver abaixo:
-* ./p2/vr \<PID of Process> \<Time of Refresh>
+* ./p2/vr *\<PID of Process>* *\<Time of Refresh>*
 
 ###Disponível em: 
 https://github.com/marcielleal/OS-project1.1
